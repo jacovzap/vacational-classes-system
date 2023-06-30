@@ -1,8 +1,8 @@
 import './globals.css'
-import { Open_Sans } from 'next/font/google'
+import { Inter } from 'next/font/google'
 import Sidebar from '@/components/sidebar/Sidebar'
 
-const openSans = Open_Sans({ subsets: ['latin'] })
+const openSans = Inter({ subsets: ['latin']})
 
 export const metadata = {
   title: 'PequeñosGenios',
@@ -15,13 +15,12 @@ export default function RootLayout ({
   children: React.ReactNode
 }) {
   return (
-    <html lang='en'>
+    <html lang='es'>
       <body className={openSans.className}>
         <div className='h-screen flex'>
           <div className='min-w-60'>
-          <Sidebar />
+            <Sidebar />
           </div>
-      
           {children}
         </div>
       </body>

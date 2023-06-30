@@ -1,31 +1,47 @@
 import { Dialog, Transition } from '@headlessui/react'
-import { Fragment, useState } from 'react'
+import { Fragment } from 'react'
+
 import TextInput from '../inputs/TextInput'
 import SelectInput from '../inputs/SelectInput'
 import NumberInput from '../inputs/NumberInput'
 import FloatInput from '../inputs/FloatInput'
+
 import { Grade } from '@/enums/Grade'
 import { Level } from '@/enums/Level'
+
+import { useStudentsHook } from '@/hooks /useStudentsHook'
+import supabase from '@/utils/supabase'
 
 interface StudentModalProps {
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
+  students: ReturnType<typeof useStudentsHook>
 }
 
-const StudentModal = ({ isOpen, setIsOpen }: StudentModalProps) => {
-  const [name, setName] = useState('')
-  const [lastName, setLastName] = useState('')
-  const [level, setLevel] = useState('')
-  const [grade, setGrade] = useState('')
-  const [age, setAge] = useState('')
-  const [balance, setBalance] = useState('')
-
+const StudentModal = ({ isOpen, setIsOpen, students }: StudentModalProps) => {
   function closeModal () {
     setIsOpen(false)
   }
 
-  function openModal () {
-    setIsOpen(true)
+  const handleRegisterClick = async () => {
+    students.setIsSubmitted(true)
+    if (
+      students.name !== '' &&
+      students.lastName !== '' &&
+      students.balance !== ''
+    ) {
+      const data = await supabase.from('Students').insert({
+        name: students.name,
+        lastName: students.lastName,
+        level: students.level,
+        grade: students.grade,
+        age: students.age,
+        balance: students.balance
+      })
+      console.log(data)
+    } else {
+      console.log('Registro fallido')
+    }
   }
 
   return (
@@ -67,32 +83,34 @@ const StudentModal = ({ isOpen, setIsOpen }: StudentModalProps) => {
                       fill='none'
                       onClick={closeModal}
                       viewBox='0 0 24 24'
-                      stroke-width='1.5'
+                      strokeWidth='1.5'
                       stroke='currentColor'
                       className='w-5 h-5 hover:cursor-pointer hover:bg-gray-100 rounded-md'
                     >
                       <path
-                        stroke-linecap='round'
-                        stroke-linejoin='round'
+                        strokeLinecap='round'
+                        strokeLinejoin='round'
                         d='M6 18L18 6M6 6l12 12'
                       />
                     </svg>
                   </Dialog.Title>
-                  <div className='w-full space-y-4'>
+                  <div className='w-full space-y-6'>
                     <div className='flex w-full space-x-5'>
                       <TextInput
                         label={'Nombre'}
-                        value={name}
+                        value={students.name}
                         onChange={value => {
-                          setName(value)
+                          students.setName(value)
                         }}
+                        isSubmitted={students.isSubmitted}
                       />
                       <TextInput
                         label={'Apellidos'}
-                        value={lastName}
+                        value={students.lastName}
                         onChange={value => {
-                          setLastName(value)
+                          students.setLastName(value)
                         }}
+                        isSubmitted={students.isSubmitted}
                       />
                     </div>
                     <div className='flex w-full space-x-5'>
@@ -102,17 +120,18 @@ const StudentModal = ({ isOpen, setIsOpen }: StudentModalProps) => {
                     <div className='flex w-full space-x-5'>
                       <NumberInput
                         label={'Edad'}
-                        value={age}
+                        value={students.age}
                         onChange={value => {
-                          setAge(value)
+                          students.setAge(value)
                         }}
                       />
                       <FloatInput
                         label={'Saldo'}
-                        value={balance}
+                        value={students.balance}
                         onChange={value => {
-                          setBalance(value)
+                          students.setBalance(value)
                         }}
+                        isSubmitted={students.isSubmitted}
                       />
                     </div>
                   </div>
@@ -123,6 +142,7 @@ const StudentModal = ({ isOpen, setIsOpen }: StudentModalProps) => {
                   rounded-md
                   text-sm
                   '
+                      onClick={handleRegisterClick}
                     >
                       Registrar Alumno
                     </button>
